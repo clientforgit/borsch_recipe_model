@@ -1,0 +1,7 @@
+{
+  "window_width": 1000,
+  "window_height": 700,
+  "dataset_size": 100,
+  "point_size": 5,
+  "max_deviation": 5
+}
