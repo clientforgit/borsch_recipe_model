@@ -3,13 +3,20 @@ from typing import Protocol
 from model import BasicModel
 from point_dto import PointDTO
 from config_load import config_data
+from matplotlib.collections import PathCollection
+from matplotlib.text import Annotation
 
 class View(Protocol):
-    points_list: list[PointDTO]
+    scatter: PathCollection
 
     def create_ui(self, presenter, y_data):
         ...
 
+    def update_annotation(self, event):
+        ...
+
+    def disable_annotation(self):
+        ...
 
 class MainWindow(Protocol):
     mpl_canvas: View
@@ -22,26 +29,17 @@ class Presenter:
     def __init__(self, view: MainWindow):
         self.view = view
         self.mpl_view = view.mpl_canvas
+        self.annotation_show = False
         self.model = BasicModel('DecisionTreeRegressor')
-
-    def find_legend_points(self):
-        first_index = None
-        second_index = None
-        for i in range(config_data["dataset_size"]):
-            if self.model.points_list[i].label == 'in max deviation interval':
-                first_index = i
-            elif self.model.points_list[i].label == 'out of max deviation interval':
-                second_index = i
-        return [first_index, second_index]
 
     def handle_on_motion(self, event):
         if event.inaxes:
-            annotation = self.mpl_view.ax.texts[0]
-            annotation.set_text(
-                f'x={event.xdata:.2f}, y={event.ydata:.2f}'
-            )
-            self.mpl_view.draw()
-
+            contains, index = self.mpl_view.scatter.contains(event)
+            if contains:
+                self.mpl_view.update_annotation(index)
+                self.annotation_show = True
+            else:
+                self.mpl_view.disable_annotation()
 
     def run(self):
-        self.view.create_ui(self, self.model.points_list, self.find_legend_points())
+        self.view.create_ui(self, self.model.points_list)

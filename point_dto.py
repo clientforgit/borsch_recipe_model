@@ -5,5 +5,5 @@ from dataclasses import dataclass
 class PointDTO:
     calories: float
     price: float
-    color: str
+    color: int
     label: str

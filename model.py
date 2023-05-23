@@ -34,10 +34,10 @@ class BasicModel:
         points_list = []
         for i in range(config_data["dataset_size"]):
             if abs(self.recipes.val_prices[i] - self.predicted_prices[i]) < max_deviation:
-                color = 'c'
+                color = 0
                 label = 'in max deviation interval'
             else:
-                color = 'r'
+                color = 1
                 label = 'out of max deviation interval'
             point = PointDTO(
                 self.recipes.val_ingredients.loc[i, "calories"],

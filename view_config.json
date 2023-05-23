@@ -1,7 +1,8 @@
 {
   "window_width": 1000,
   "window_height": 700,
+  "line_edit_width": 50,
   "dataset_size": 100,
-  "point_size": 5,
+  "point_size": 50,
   "max_deviation": 5
 }
