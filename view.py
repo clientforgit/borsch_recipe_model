@@ -29,7 +29,8 @@ class MplCanvas(FigureCanvasQTAgg):
         self.plot_init(points)
         self.connect_events(presenter)
 
-    def plot_init(self, points: list[PointDTO], legend_points: list[int]):
+    def plot_init(self, points: list[PointDTO]):
+        plt.tight_layout(pad=0)
         self.ax.grid()
         self.scatter = self.ax.scatter(
             [point.calories for point in points],
@@ -90,36 +91,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setFixedHeight(config_data["window_height"])
         self.setFixedWidth(config_data["window_width"])
 
-        layout = QtWidgets.QVBoxLayout()
+        self.main_layout = QtWidgets.QVBoxLayout()
         self.__add_variables_layout()
         self.__add_tabs(model_characteristics)
 
-        layout.addWidget(self.mpl_canvas)
-
         widget = QtWidgets.QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(self.main_layout)
         self.setCentralWidget(widget)
 
         self.show()
-
-    def __add_tabs(self, model_characteristics: dict):
-        self.tabs = QtWidgets.QTabWidget()
-        tab1 = QtWidgets.QWidget()
-        self.tabs.addTab(tab1, "DecisionTreeRegressor")
-        self.add_tabs_content(tab1, model_characteristics)
-
-    def add_tabs_content(self, tab, model_characteristics: dict):
-        tab_layout = QtWidgets.QVBoxLayout()
-        self.__add_tabs_characteristics(tab_layout, model_characteristics)
-        self.__add_mpl_plots_control(tab_layout)
-        tab.setLayout(tab_layout)
-
-    def __add_tabs_characteristics(self, tab_layout, model_characteristics: dict):
-        characteristics_layout = QtWidgets.QHBoxLayout()
-        characteristics_layout.addWidget(QtWidgets.QLabel(f"ROC AUC : {self.model_characteristics['ROC AUC']}"))
-        characteristics_layout.addWidget(QtWidgets.QLabel(f"MSE: {self.model_characteristics['MSE']}"))
-        characteristics_layout.addWidget(QtWidgets.QLabel(f"R2: {self.model_characteristics['R2']}"))
-        tab_layout.addLayout(characteristics_layout)
 
     def __add_variables_layout(self):
         variables_section = QtWidgets.QHBoxLayout()
@@ -146,3 +126,40 @@ class MainWindow(QtWidgets.QMainWindow):
         variables_section.addWidget(size_line_edit)
         variables_section.addStretch()
         self.main_layout.addLayout(variables_section)
+
+    def __add_tabs(self, model_characteristics: dict):
+        self.tabs = QtWidgets.QTabWidget()
+        tab1 = QtWidgets.QWidget()
+        self.tabs.addTab(tab1, "DecisionTreeRegressor")
+        self.add_tabs_content(tab1, model_characteristics)
+        self.main_layout.addWidget(self.tabs)
+
+    def add_tabs_content(self, tab, model_characteristics: dict):
+        tab_layout = QtWidgets.QHBoxLayout()
+        self.__add_tabs_characteristics(tab_layout, model_characteristics)
+        self.__add_buttons_layout(tab_layout)
+        tab.setLayout(tab_layout)
+
+    def __add_buttons_layout(self, tab_layout):
+        buttons_layout = QtWidgets.QVBoxLayout()
+        main_button = QtWidgets.QPushButton("Main")
+        main_button.setFixedWidth(200)
+        buttons_layout.addWidget(main_button)
+        buttons_layout.addWidget(QtWidgets.QPushButton("REC curve"))
+        buttons_layout.addWidget(QtWidgets.QPushButton("Scatter plot"))
+        buttons_layout.addWidget(QtWidgets.QPushButton("Learning curve"))
+        buttons_layout.addStretch()
+        buttons_layout.addLayout(buttons_layout)
+        tab_layout.addLayout(buttons_layout)
+
+    def __add_tabs_characteristics(self, tab_layout, model_characteristics: dict):
+        plot_layout = QtWidgets.QVBoxLayout()
+        characteristics_layout = QtWidgets.QHBoxLayout()
+        characteristics_layout.addWidget(QtWidgets.QLabel(f"cov : {model_characteristics['cov']}"))
+        characteristics_layout.addWidget(QtWidgets.QLabel(f"MSE: {model_characteristics['MSE']}"))
+        characteristics_layout.addWidget(QtWidgets.QLabel(f"R2: {model_characteristics['R2']}"), stretch=1)
+        plot_layout.addLayout(characteristics_layout)
+        plot_layout.addWidget(self.mpl_canvas)
+        plot_layout.addStretch()
+        tab_layout.addLayout(plot_layout)
+

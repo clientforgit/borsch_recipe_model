@@ -26,6 +26,10 @@ class BasicModel:
         self.model.fit(self.recipes.train_ingredients, self.recipes.train_prices)
         self.predicted_prices = self.model.predict(self.recipes.val_ingredients)
         self.points_list = self.__create_points_list(max_deviation)
+        self.model_characteristics = self.__get_model_characteristics()
+
+    def __get_model_characteristics(self):
+        return {"cov": 1, "MSE": 1, "R2": 1}
 
     def mae(self):
         return abs(np.array(self.recipes.val_prices) - self.predicted_prices).mean()

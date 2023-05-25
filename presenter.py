@@ -21,7 +21,7 @@ class View(Protocol):
 class MainWindow(Protocol):
     mpl_canvas: View
 
-    def create_ui(self, presenter, points_list: list[PointDTO]):
+    def create_ui(self, presenter, points_list: list[PointDTO], model_characteristics: dict):
         ...
 
 
@@ -42,4 +42,4 @@ class Presenter:
                 self.mpl_view.disable_annotation()
 
     def run(self):
-        self.view.create_ui(self, self.model.points_list)
+        self.view.create_ui(self, self.model.points_list, self.model.model_characteristics)
